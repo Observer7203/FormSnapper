@@ -1,3 +1,18 @@
 body {
     background-color: skyblue;
 }
+@import "~@mdi/font/css/materialdesignicons.min.css";
+.box-table {
+    margin-top: 50px !important;
+    background: #fff !important;
+    padding: 1.25rem 1.25rem !important;
+    border-radius: 0.25rem !important;
+}
+
+.authBodyBg {
+    background: #f8f8fb;
+}
+
+.table {
+    font-family: var(--bs-body-font-family);
+}

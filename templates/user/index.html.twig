@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello UserController!{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('assets/libs/owl.carousel/assets/owl.carousel.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/libs/owl.carousel/assets/owl.theme.default.min.css') }}">
+<link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/materialdesignicons.min.css') }}" rel="stylesheet">
+<link href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+<link href="{{ asset('node_modules/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+<script src="{{ asset('assets/js/plugin.js') }}"></script>
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+<link href="https://unpkg.com/boxicons/css/boxicons.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    .example-wrapper {
+    display: none !important;
+}
+
+
+
+.container.box-table {
+    margin-top: 50px !important;
+    background: #fff !important;
+    padding: 1.25rem 1.25rem !important;
+    border-radius: 0.25rem !important;
+}
+
+.auth-body-bg {
+    background: #f8f8fb;
+    --bs-table-striped-bg: #fff !important;
+}
+
+table {
+    font-family: var(--bs-body-font-family);
+    
+}
+</style>
+
+                    {% if app.user %}
+                        <div class="alert alert-success text-center">
+                            You are logged in as <strong>{{ app.user.userIdentifier }}</strong>, 
+                            <a href="{{ path('app_logout') }}" class="text-danger">Logout</a>
+                        </div>
+                    {% endif %}
+
+<div class="example-wrapper">
+    <h1>Hello {{ controller_name }}! ✅</h1>
+
+    This friendly message is coming from:
+    <ul>
+        <li>Your controller at <code>/mnt/c/symphony_projects/authorization_web_app/user-management/src/Controller/UserController.php</code></li>
+        <li>Your template at <code>/mnt/c/symphony_projects/authorization_web_app/user-management/templates/user/index.html.twig</code></li>
+    </ul>
+</div>
+{% endblock %}

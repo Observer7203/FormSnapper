@@ -1,0 +1,206 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('assets/libs/owl.carousel/assets/owl.carousel.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/libs/owl.carousel/assets/owl.theme.default.min.css') }}">
+<link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/materialdesignicons.min.css') }}" rel="stylesheet">
+<link href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+<link href="{{ asset('node_modules/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+<script src="{{ asset('assets/js/plugin.js') }}"></script>
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+<link href="https://unpkg.com/boxicons/css/boxicons.min.css" rel="stylesheet">
+{% endblock %}
+{% block body %}
+<div>
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <div class="col-xl-4">
+            <div class="auth-full-page-content p-md-5 p-4">
+                <div class="w-100">
+                    <div class="d-flex flex-column h-100">
+                        <div class="my-auto">
+                                <h5 class="text-primary text-center">Welcome Back!</h5>
+                                <p class="text-muted text-center">Sign in to continue</p>
+                            
+
+                            {% if error %}
+                                <div class="alert alert-danger">
+                                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                                </div>
+                            {% endif %}
+
+                            {% if app.user %}
+                                <div class="alert alert-success text-center">
+                                    You are logged in as <strong>{{ app.user.userIdentifier }}</strong>, 
+                                    <a href="{{ path('app_logout') }}" class="text-danger">Logout</a>
+                                </div>
+                            {% endif %}
+
+                            <form method="post" action="{{ path('app_login') }}">
+                                <div class="mb-3">
+                                    <label for="inputEmail" class="form-label">Email</label>
+                                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" 
+                                        class="form-control" autocomplete="email" required autofocus>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="inputPassword" class="form-label">Password</label>
+                                    <div class="input-group auth-pass-inputgroup">
+                                        <input type="password" name="password" id="inputPassword" class="form-control" 
+                                            autocomplete="current-password" required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+                                            <i class="mdi mdi-eye-outline"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="_remember_me" id="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                                </div>
+                                <div class="mt-3 d-grid">
+                                <button class="btn btn-primary waves-effect waves-light" type="submit">Sign in</button>
+                                </div>
+                            </form>
+
+                            <div class="mt-4 text-center">
+                                <p>Don't have an account? <a href="{{ path('app_register') }}" class="fw-medium text-primary">Sign up now</a></p>
+                            </div>
+                        </div>
+                            <div class="mt-4 mt-md-5 text-center">
+                                <p class="mb-0">&copy; <script>document.write(new Date().getFullYear())</script> User Management System. Crafted with <i class="mdi mdi-heart text-danger"></i> by Sanzhar Kamidenov</p>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Right Side -->
+            <div class="col-xl-8">
+                        <div class="auth-full-bg">
+                            <div class="w-100">
+                                <div class="bg-overlay"></div>
+                                <div class="d-flex h-100 flex-column">
+                                      <div class="p-4 mt-auto">
+                                        <div class="row justify-content-center">
+                                            <div class="col-lg-12">
+                                                <div class="text-center">
+                                                    
+                                                    <h1 class="mb-3 main-title"><span class="text-primary text-white">AuthoList</span>
+                                                    </h1>
+                                                    
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 mt-auto">
+                                        <div class="row justify-content-center">
+                                            <div class="col-lg-7">
+                                                <div class="text-center">
+                                                    
+                                                    <h4 class="mb-3"><i class="bx bxs-user text-primary h1 align-middle me-3"></i><span class="text-primary">Welcome to User Management System</span>
+                                                    </h4>
+                                                    
+                                                    <div dir="ltr">
+                                                        <div class="owl-carousel owl-theme auth-review-carousel" id="auth-review-carousel">
+                                                            <div class="item">
+                                                                <div class="py-3">
+                                                                    <p class="font-size-16 mb-4 text-white">"Easily manage user accounts with secure authentication, role-based access, and real-time status tracking. Simple, efficient, and powerful."</p>
+    
+                                                                    <div>
+                                                                        <h4 class="font-size-16 text-primary">AuthoList</h4>
+                                                                        <p class="font-size-14 mb-0 text-white">2025</p>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                            </div>
+    
+              
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end col -->
+            <!-- End Right Side -->
+    </div>
+</div>
+</div>
+<style>
+
+.bg-overlay {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    opacity: .7;
+    background-color: #000;
+}
+      .auth-full-bg .bg-overlay {
+    background: url(https://cdn1.kdt.kz/files/sites/20014/files/bg%20%281%29.jpg?_t=1738114554);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+        
+        .auth-full-bg {
+    background-color: rgba(29, 46, 129);
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex
+;
+}
+                @media screen and (min-width: 600px) {
+    .main-title {
+         font-size: 90px;
+    }
+}
+        @media screen and (min-width: 767px) {
+    .main-title {
+         font-size: 120px;
+    }
+}
+                @media screen and (min-width: 1200px) {
+    .main-title {
+         font-size: 120px;
+    }
+}
+        
+                        @media screen and (min-width: 1500px) {
+    .main-title {
+         font-size: 154px;
+    }
+}
+
+@import "~@mdi/font/css/materialdesignicons.min.css";
+     
+</style>
+
+<script>
+    function togglePassword() {
+        let passwordField = document.getElementById("inputPassword");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+        } else {
+            passwordField.type = "password";
+        }
+    }
+</script>
+
+{% endblock %}

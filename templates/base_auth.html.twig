@@ -17,11 +17,6 @@
     height: 100vh !important;
 }
     </style>
-{% if app.request.attributes.get('_route') not in ['app_login'] %}
-    <div id="root"></div>
-{% endif %}
-
-
 
         {% block body %}{% endblock %}
 

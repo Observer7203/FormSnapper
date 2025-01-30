@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Регистрация{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+         <link rel="stylesheet" href="{{ asset('assets/libs/owl.carousel/assets/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/libs/owl.carousel/assets/owl.theme.default.min.css') }}">
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('assets/libs/owl.carousel/assets/owl.carousel.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/libs/owl.carousel/assets/owl.theme.default.min.css') }}">
+<link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/materialdesignicons.min.css') }}" rel="stylesheet">
+<link href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+<link href="{{ asset('node_modules/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+<script src="{{ asset('assets/js/plugin.js') }}"></script>
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+<link href="https://unpkg.com/boxicons/css/boxicons.min.css" rel="stylesheet">
+{% endblock %}
+    </head>
+    
+    <body class="auth-body-bg">
+    <style>
+    div#root {
+    background: #f8f8fb;
+    height: 100vh !important;
+}
+    </style>
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <div class="col-xl-4">
+            <div class="auth-full-page-content p-md-5 p-4">
+                <div class="w-100">
+                    <div class="d-flex flex-column h-100">
+                        <div class="my-auto">
+                            <h5 class="text-primary text-center">Create an account</h5>
+                            <p class="text-muted text-center">Fill the form below</p>
+
+                            {% for message in app.flashes('success') %}
+                                <div class="alert alert-success">{{ message }}</div>
+                            {% endfor %}
+
+                            {% for message in app.flashes('error') %}
+                                <div class="alert alert-danger">{{ message }}</div>
+                            {% endfor %}
+
+                            <form method="post" action="{{ path('app_register') }}">
+                                {{ form_start(form) }}
+                                {{ form_row(form.email) }}
+                                {{ form_row(form.plainPassword.first) }}
+                                {{ form_row(form.plainPassword.second) }}
+                                <button class="btn btn-primary mt-3 w-100" type="submit">Register</button>
+                                {{ form_end(form) }}
+                            </form>
+                            <div class="mt-4 text-center">
+                                <p>Already have an account? <a href="{{ path('app_login') }}" class="fw-medium text-primary">Sign in</a></p>
+                            </div>
+                        </div>
+                        <div class="mt-4 mt-md-5 text-center">
+                            <p class="mb-0">&copy; {{ "now"|date("Y") }} User Management System</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Правая часть с фоном -->
+        <div class="col-xl-8">
+            <div class="auth-full-bg">
+                <div class="w-100">
+                    <div class="bg-overlay"></div>
+                    <div class="d-flex h-100 flex-column">
+                        <div class="p-4 mt-auto">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-12">
+                                    <div class="text-center">
+                                        <h1 class="mb-3 main-title"><span class="text-primary text-white">AuthoList</span></h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 mt-auto">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-7">
+                                    <div class="text-center">
+                                        <h4 class="mb-3">
+                                            <i class="bx bxs-user text-primary h1 align-middle me-3"></i>
+                                            <span class="text-primary">Welcome to User Management System</span>
+                                        </h4>
+                                        <p class="font-size-16 mb-4 text-white">
+                                            "Easily manage user accounts with secure authentication, role-based access, and real-time status tracking. Simple, efficient, and powerful."
+                                        </p>
+                                        <h4 class="font-size-16 text-primary">AuthoList</h4>
+                                        <p class="font-size-14 mb-0 text-white">2025</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Конец правой части -->
+    </div>
+</div>
+
+<style>
+
+.bg-overlay {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    opacity: .7;
+    background-color: #000;
+}
+      .auth-full-bg .bg-overlay {
+    background: url(https://cdn1.kdt.kz/files/sites/20014/files/bg%20%281%29.jpg?_t=1738114554);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+        
+        .auth-full-bg {
+    background-color: rgba(29, 46, 129);
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex
+;
+}
+                @media screen and (min-width: 600px) {
+    .main-title {
+         font-size: 90px;
+    }
+}
+        @media screen and (min-width: 767px) {
+    .main-title {
+         font-size: 120px;
+    }
+}
+                @media screen and (min-width: 1200px) {
+    .main-title {
+         font-size: 120px;
+    }
+}
+        
+                        @media screen and (min-width: 1500px) {
+    .main-title {
+         font-size: 154px;
+    }
+}
+
+@import "~@mdi/font/css/materialdesignicons.min.css";
+     
+</style>
+
+<script>
+    function togglePassword() {
+        let passwordField = document.getElementById("inputPassword");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+        } else {
+            passwordField.type = "password";
+        }
+    }
+</script>
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+    </body>
+</html>
