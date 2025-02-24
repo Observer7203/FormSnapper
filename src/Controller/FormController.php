@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Form;
 use App\Entity\Response;
+use App\Entity\Question;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,21 +17,36 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class FormController extends AbstractController
 {
     #[Route('/api/forms', name: 'create_form', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function createCustomForm(Request $request, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $form = new Form();
-        $form->setTitle($data['title']);
-        $form->setDescription($data['description'] ?? null);
-        $form->setQuestions($data['questions']);
-        $form->setAuthor($this->getUser());
+#[IsGranted('ROLE_USER')]
+public function createCustomForm(Request $request, EntityManagerInterface $entityManager): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    $form = new Form();
+    $form->setTitle($data['title']);
+    $form->setDescription($data['description'] ?? null);
+    $form->setAuthor($this->getUser());
 
-        $entityManager->persist($form);
-        $entityManager->flush();
+    foreach ($data['questions'] as $qData) {
+        $question = new Question();
+        $question->setForm($form);
+        $question->setText($qData['text']);
+        $question->setType($qData['type']);
+        
+        if (isset($qData['options'])) {
+            $question->setOptions($qData['options']);
+        }
+        if (isset($qData['maxScale']) && $qData['type'] === "scale") {
+            $question->setMaxScale($qData['maxScale']);
+        }
 
-        return $this->json(['message' => 'Форма создана!', 'id' => $form->getId()]);
+        $form->addQuestion($question);
     }
+
+    $entityManager->persist($form);
+    $entityManager->flush();
+
+    return $this->json(['message' => 'Форма создана!', 'id' => $form->getId()]);
+}
 
     #[Route('/api/forms', name: 'list_forms', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]

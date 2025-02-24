@@ -4,6 +4,23 @@ import axios from "axios";
 function CreateForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [questions, setQuestions] = useState([]);
+
+  const handleAddQuestion = () => {
+    setQuestions([...questions, { text: "", type: "text", options: [] }]);
+  };
+
+  const handleQuestionChange = (index, field, value) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[index][field] = value;
+    setQuestions(updatedQuestions);
+  };
+
+  const handleRemoveQuestion = (index) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions.splice(index, 1);
+    setQuestions(updatedQuestions);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -12,12 +29,12 @@ function CreateForm() {
       const response = await axios.post("/api/forms", {
         title,
         description,
-        questions: []
+        questions
       });
 
       if (response.status === 200) {
         alert("Форма успешно создана!");
-        window.location.href = "/forms"; // Вместо useNavigate()
+        window.location.href = "/forms";
       }
     } catch (error) {
       console.error("Ошибка при создании формы:", error);
@@ -47,11 +64,62 @@ function CreateForm() {
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
-        <button type="submit" className="btn btn-primary">Создать</button>
+
+        <h4>Вопросы</h4>
+        {questions.map((q, index) => (
+          <div key={index} className="mb-3 p-3 border rounded">
+            <input
+              type="text"
+              className="form-control mb-2"
+              placeholder="Текст вопроса"
+              value={q.text}
+              onChange={(e) => handleQuestionChange(index, "text", e.target.value)}
+              required
+            />
+            <select
+              className="form-select mb-2"
+              value={q.type}
+              onChange={(e) => handleQuestionChange(index, "type", e.target.value)}
+            >
+              <option value="text">Текст</option>
+              <option value="number">Число</option>
+              <option value="radio">Один вариант</option>
+              <option value="checkbox">Несколько вариантов</option>
+              <option value="file_upload">Загрузка файла</option>
+              <option value="rating">Оценка</option>
+              <option value="scale">Шкала</option>
+            </select>
+
+            {(q.type === "radio" || q.type === "checkbox") && (
+              <div>
+                <h6>Варианты ответов</h6>
+                {q.options.map((opt, i) => (
+                  <input
+                    key={i}
+                    type="text"
+                    className="form-control mb-1"
+                    placeholder={`Вариант ${i + 1}`}
+                    value={opt}
+                    onChange={(e) => {
+                      const updatedOptions = [...q.options];
+                      updatedOptions[i] = e.target.value;
+                      handleQuestionChange(index, "options", updatedOptions);
+                    }}
+                  />
+                ))}
+                <button type="button" className="btn btn-sm btn-outline-primary mt-1" onClick={() => handleQuestionChange(index, "options", [...q.options, ""])}>Добавить вариант</button>
+              </div>
+            )}
+
+            <button type="button" className="btn btn-sm btn-outline-danger mt-2" onClick={() => handleRemoveQuestion(index)}>Удалить</button>
+          </div>
+        ))}
+
+        <button type="button" className="btn btn-secondary" onClick={handleAddQuestion}>Добавить вопрос</button>
+        <button type="submit" className="btn btn-primary mt-3">Создать</button>
       </form>
     </div>
   );
 }
 
 export default CreateForm;
-
