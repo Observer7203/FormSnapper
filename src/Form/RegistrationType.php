@@ -27,7 +27,7 @@ class RegistrationType extends AbstractType
             ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'mapped' => false, // Чтобы Symfony не пытался записать в БД
+                'mapped' => true, 
                 'attr' => ['class' => 'form-control', 'placeholder' => 'Введите пароль'],
                 'constraints' => [
                     new Assert\NotBlank(message: "The password must not be empty"),

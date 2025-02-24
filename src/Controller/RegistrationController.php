@@ -1,10 +1,8 @@
 <?php
 
-// src/Controller/RegistrationController.php
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Enum\UserStatus;
 use App\Form\RegistrationType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,33 +20,28 @@ class RegistrationController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response {
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_users');
+            return $this->redirectToRoute('app_home');
         }
 
         $user = new User();
         $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);
-        
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Получаем plainPassword из формы
-            $plainPassword = $form->get('plainPassword')->getData();
-            
+            $plainPassword = $user->getPlainPassword();
             if (!$plainPassword) {
                 $this->addFlash('error', 'Пароль обязателен.');
                 return $this->redirectToRoute('app_register');
             }
 
-            // Хешируем и устанавливаем пароль
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
-            $user->setPassword($hashedPassword)
-                ->setStatus(UserStatus::Active);
-
-            // Сохраняем пользователя в БД
+            $user->setPassword($hashedPassword);
+            
+            $user->setRoles(["ROLE_USER"]); // Даем стандартную роль пользователю
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Вы успешно зарегистрировались! Теперь войдите в систему.');
+            $this->addFlash('success', 'Регистрация успешна! Теперь войдите в аккаунт.');
             return $this->redirectToRoute('app_login');
         }
 
@@ -57,13 +50,3 @@ class RegistrationController extends AbstractController
         ]);
     }
 }
-
-
-
-
-
-
-
-
-
-

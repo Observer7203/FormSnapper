@@ -43,74 +43,47 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user_list'])]
     private ?\DateTimeInterface $lastLogin = null;
 
-    // Геттеры и сеттеры для id
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    #[ORM\Column(type: "json")]
+    private array $roles = [];
 
-    // Геттеры и сеттеры для email
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
+    public function getId(): ?int { return $this->id; }
+    public function getEmail(): ?string { return $this->email; }
+    public function setEmail(string $email): self { $this->email = $email; return $this; }
+    public function getPassword(): ?string { return $this->password; }
+    public function setPassword(string $password): self { $this->password = $password; return $this; }
+    public function getStatus(): UserStatus { return $this->status; }
+    public function setStatus(UserStatus $status): self { $this->status = $status; return $this; }
+    public function getLastLogin(): ?\DateTimeInterface { return $this->lastLogin; }
+    public function setLastLogin(?\DateTimeInterface $lastLogin): self { $this->lastLogin = $lastLogin; return $this; }
 
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-        return $this;
-    }
-
-    // Геттеры и сеттеры для password
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-        return $this;
-    }
-
-    // Геттеры и сеттеры для status
-    public function getStatus(): UserStatus
-    {
-        return $this->status;
-    }
-
-    public function setStatus(UserStatus $status): self
-    {
-        $this->status = $status;
-        return $this;
-    }
-
-    // Геттеры и сеттеры для lastLogin
-    public function getLastLogin(): ?\DateTimeInterface
-    {
-        return $this->lastLogin;
-    }
-
-    public function setLastLogin(?\DateTimeInterface $lastLogin): self
-    {
-        $this->lastLogin = $lastLogin;
-        return $this;
-    }
-
-    // Реализация методов UserInterface
     public function getRoles(): array
     {
-        // Устанавливаем роль пользователя. Можно добавить больше ролей
-        return ['ROLE_USER'];
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER'; // Все пользователи - пользователи по умолчанию
+        return array_unique($roles);
     }
 
-    public function eraseCredentials(): void
+    public function setRoles(array $roles): self
     {
-        // Очищаем чувствительные данные, если нужно (например, plain password)
+        $this->roles = $roles;
+        return $this;
     }
 
-    public function getUserIdentifier(): string
-    {
-        return $this->email;
-    }
+    #[ORM\Transient] // Не сохраняем в БД
+private ?string $plainPassword = null;
+
+public function getPlainPassword(): ?string
+{
+    return $this->plainPassword;
+}
+
+public function setPlainPassword(?string $plainPassword): self
+{
+    $this->plainPassword = $plainPassword;
+    return $this;
+}
+
+    public function eraseCredentials(): void {}
+
+    public function getUserIdentifier(): string { return $this->email; }
 }
