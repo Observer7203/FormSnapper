@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+
 class FormController extends AbstractController
 {
     #[Route('/api/forms', name: 'create_form', methods: ['POST'])]
@@ -46,7 +47,7 @@ class FormController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/api/forms/{id}', name: 'view_form', methods: ['GET'])]
+    #[Route('/api/forms/{id}', name: 'app_view_form', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function viewForm(Form $form): JsonResponse
     {
@@ -59,7 +60,7 @@ class FormController extends AbstractController
         ]);
     }
 
-    #[Route('/api/forms/{id}/edit', name: 'edit_form', methods: ['PUT'])]
+    #[Route('/api/forms/{id}/edit', name: 'app_edit_form', methods: ['PUT'])]
     #[IsGranted('ROLE_USER')]
     public function editForm(Request $request, Form $form, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -77,7 +78,7 @@ class FormController extends AbstractController
         return $this->json(['message' => 'Форма обновлена!']);
     }
 
-    #[Route('/api/forms/{id}/delete', name: 'delete_form', methods: ['DELETE'])]
+    #[Route('/api/forms/{id}/delete', name: 'app_delete_form', methods: ['DELETE'])]
     #[IsGranted('ROLE_USER')]
     public function deleteForm(Form $form, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -117,4 +118,12 @@ class FormController extends AbstractController
             'forms' => $forms
         ]);
     }
+
+    #[Route('/forms/create', name: 'app_create_form', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function createFormPage(): HttpResponse
+    {
+        return $this->render('base.html.twig');
+    }
+
 }

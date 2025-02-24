@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 function FormList() {
   const [forms, setForms] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get("/api/forms")
@@ -12,10 +10,14 @@ function FormList() {
       .catch((error) => console.error("Ошибка загрузки форм:", error));
   }, []);
 
+  const handleCreateForm = () => {
+    window.location.href = "/forms/create"; // Вместо useNavigate()
+  };
+
   return (
     <div>
       <h2>Мои формы</h2>
-      <button onClick={() => navigate("/forms/create")}>Создать форму</button>
+      <button onClick={handleCreateForm}>Создать форму</button>
       <ul>
         {forms.map((form) => (
           <li key={form.id}>
