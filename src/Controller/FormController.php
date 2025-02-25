@@ -63,18 +63,31 @@ public function createCustomForm(Request $request, EntityManagerInterface $entit
         return $this->json($data);
     }
 
-    #[Route('/api/forms/{id}', name: 'app_view_form', methods: ['GET'])]
+    #[Route('/api/forms/{id}', name: 'api_view_form', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function viewForm(Form $form): JsonResponse
+    public function apiViewForm(Form $form): JsonResponse
     {
         return $this->json([
             'id' => $form->getId(),
             'title' => $form->getTitle(),
             'description' => $form->getDescription(),
-            'questions' => $form->getQuestions(),
-            'author' => $form->getAuthor()->getEmail()
+            'questions' => $form->getQuestions()->map(fn($q) => [
+                'id' => $q->getId(),
+                'text' => $q->getText(),
+                'type' => $q->getType(),
+                'options' => $q->getOptions()
+            ])->toArray()
         ]);
     }
+    
+
+    #[Route('/forms/{id}', name: 'app_view_form', methods: ['GET'])]
+        #[IsGranted('ROLE_USER')]
+        public function viewFormPage(Form $form): HttpResponse
+        {
+            return $this->render('base.html.twig');
+        }
+
 
     #[Route('/api/forms/{id}/edit', name: 'app_edit_form', methods: ['PUT'])]
     #[IsGranted('ROLE_USER')]
