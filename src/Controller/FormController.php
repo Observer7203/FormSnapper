@@ -61,6 +61,7 @@ public function createCustomForm(Request $request, EntityManagerInterface $entit
             'id' => $form->getId(),
             'title' => $form->getTitle(),
             'description' => $form->getDescription(),
+            'questions' => count($form->getQuestions()),
         ], $forms);
 
         return $this->json($data);

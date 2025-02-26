@@ -58,10 +58,10 @@ function FormList() {
                     <h5 className="card-title">{form.title}</h5>
                     <p className="card-text text-muted">{form.description || "Без описания"}</p>
                     <p className="small text-secondary">
-                      <i className="bi bi-ui-checks"></i> {form.questions?.length || 0} вопросов
+                      <i className="bi bi-ui-checks"></i> {form.questions || 0} вопросов
                     </p>
                     <div className="d-flex justify-content-between">
-                      <a href={`/forms/${form.id}`} className="btn btn-sm btn-outline-info">Просмотр</a>
+                      <a href={`/form/${form.id}`} className="btn btn-sm btn-outline-info">Просмотр</a>
                       <a href={`/forms/${form.id}/edit`} className="btn btn-sm btn-outline-warning">Редактировать</a>
                       <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteForm(form.id)}>
                         Удалить
