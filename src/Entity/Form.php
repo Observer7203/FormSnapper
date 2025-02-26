@@ -48,6 +48,14 @@ class Form
     public function setDescription(?string $description): self { $this->description = $description; return $this; }
     
     public function getQuestions(): Collection { return $this->questions; }
+
+
+    public function setQuestions($questions): self
+    {
+        $this->questions = $questions;
+        return $this;
+    }
+
     
     public function addQuestion(Question $question): self
     {
@@ -67,6 +75,7 @@ class Form
         }
         return $this;
     }
+
 
     public function getAuthor(): User { return $this->author; }
     public function setAuthor(User $author): self { $this->author = $author; return $this; }

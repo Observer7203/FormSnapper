@@ -46,7 +46,7 @@ class Question
     return $this->form;
 }
 
-public function setForm(Form $form): self
+public function setForm(?Form $form): self
 {
     $this->form = $form;
     return $this;
