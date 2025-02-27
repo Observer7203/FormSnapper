@@ -5,10 +5,14 @@ function FormList() {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
+    // Загружаем список форм
     axios.get("/api/forms")
       .then((response) => {
+        console.log("Формы загружены:", response.data);
         setForms(response.data);
         setLoading(false);
       })
@@ -17,6 +21,15 @@ function FormList() {
         setError("Ошибка загрузки данных");
         setLoading(false);
       });
+
+    // Запрашиваем информацию о текущем пользователе
+    axios.get("/api/user-role")
+      .then(response => {
+        console.log("Данные пользователя:", response.data);
+        setUserRole(response.data.role);
+        setUserId(response.data.id);
+      })
+      .catch(error => console.error("Ошибка получения роли:", error));
   }, []);
 
   const handleCreateForm = () => {
@@ -51,7 +64,7 @@ function FormList() {
       ) : (
         <div className="row">
           {forms.length > 0 ? (
-            forms.map((form, index) => (
+            forms.map((form) => (
               <div key={form.id} className="col-md-4 mb-4">
                 <div className="card shadow-sm border-0">
                   <div className="card-body">
@@ -62,10 +75,17 @@ function FormList() {
                     </p>
                     <div className="d-flex justify-content-between">
                       <a href={`/form/${form.id}`} className="btn btn-sm btn-outline-info">Просмотр</a>
-                      <a href={`/forms/${form.id}/edit`} className="btn btn-sm btn-outline-warning">Редактировать</a>
-                      <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteForm(form.id)}>
-                        Удалить
-                      </button>
+
+                      {/** Проверяем, является ли пользователь автором или админом */}
+                      {userId && (userId === form.authorId || userRole?.includes("ROLE_ADMIN")) && (
+                        <>
+                          <a href={`/forms/${form.id}/edit`} className="btn btn-sm btn-outline-warning">Редактировать</a>
+                          <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteForm(form.id)}>
+                            Удалить
+                          </button>
+                        </>
+                      )}
+
                     </div>
                   </div>
                 </div>
@@ -81,4 +101,3 @@ function FormList() {
 }
 
 export default FormList;
-

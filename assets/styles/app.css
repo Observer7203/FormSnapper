@@ -16,3 +16,19 @@ body {
 .table {
     font-family: var(--bs-body-font-family);
 }
+
+.card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Ограничение в 2 строки */
+    line-clamp: 2; /* Ограничение в 2 строки */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 3.2em; /* Подстроить под размер шрифта */
+  }
+
+  button.btn.btn-primary.mt-3 {
+    margin-top: 0 !important;
+    margin-left: 10px;
+}
+  

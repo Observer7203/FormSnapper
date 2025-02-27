@@ -9,7 +9,7 @@ function FormView() {
   const [error, setError] = useState(null);
   const [responses, setResponses] = useState([]);
   const [userRole, setUserRole] = useState(null);
-
+  
   useEffect(() => {
     axios.get(`/api/forms/${id}`)
       .then((response) => {
@@ -21,21 +21,22 @@ function FormView() {
         setError("Ошибка загрузки формы");
         setLoading(false);
       });
-
+  
     axios.get("/api/user-role")
       .then(response => {
         setUserRole(response.data.role.includes("ROLE_ADMIN") ? "admin" : "user");
       })
       .catch(error => console.error("Ошибка получения роли:", error));
   }, [id]);
-
+  
   useEffect(() => {
-    if (userRole === "admin" || (form && form.author === userRole)) {
+    if (userRole === "admin" || (form && form.authorId === userId)) {  // ✅ Автор тоже видит
       axios.get(`/api/forms/${id}/responses`)
         .then((response) => setResponses(response.data))
         .catch((error) => console.error("Ошибка загрузки ответов:", error));
     }
   }, [id, userRole, form]);
+  
 
 
     const handleChange = (questionId, value) => {

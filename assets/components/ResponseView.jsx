@@ -14,6 +14,14 @@ function ResponseView() {
   const [maxScore, setMaxScore] = useState(0);
   const [isScorable, setIsScorable] = useState(false); // ✅ Добавили `isScorable`
 
+
+useEffect(() => {
+  axios.get(`/api/forms/${id}/is-scorable`)  // ✅ Проверяем, оценивается ли форма
+    .then((res) => setIsScorable(res.data.isScorable))
+    .catch((error) => console.error("Ошибка проверки is_scorable:", error));
+}, [id]);
+
+
   useEffect(() => {
     axios.get("/api/user-role")
       .then(response => {

@@ -67,6 +67,7 @@ public function createCustomForm(Request $request, EntityManagerInterface $entit
             'title' => $form->getTitle(),
             'description' => $form->getDescription(),
             'questions' => count($form->getQuestions()),
+            'authorId' => $form->getAuthor()->getId(), // **Добавляем ID автора**
         ], $forms);
 
         return $this->json($data);
@@ -205,5 +206,13 @@ public function deleteForm(Form $form, EntityManagerInterface $entityManager): J
     {
         return $this->render('base.html.twig');
     }
+
+    #[Route('/api/forms/{id}/is-scorable', name: 'check_is_scorable', methods: ['GET'])]
+#[IsGranted('ROLE_USER')]
+public function checkIsScorable(Form $form): JsonResponse
+{
+    return $this->json(['isScorable' => $form->getIsScorable()]);
+}
+
 
 }

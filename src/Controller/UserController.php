@@ -131,11 +131,5 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/api/user-role', name: 'app_user_role', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
-    public function getUserRole(): JsonResponse
-    {
-        return $this->json(['role' => $this->getUser()->getRoles()]);
-    }
 
 }
