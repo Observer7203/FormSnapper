@@ -14,52 +14,68 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class QuestionController extends AbstractController
 {
     #[Route('/api/forms/{id}/questions', name: 'add_question', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function addQuestion(Request $request, Form $form, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
+#[IsGranted('ROLE_USER')]
+public function addQuestion(Request $request, Form $form, EntityManagerInterface $entityManager): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
 
-        $question = new Question();
-        $question->setForm($form);
+    $question = new Question();
+    $question->setForm($form);
+    $question->setText($data['text']);
+    $question->setType($data['type']);
+
+    if (isset($data['options'])) {
+        $question->setOptions($data['options']);
+    }
+    if (isset($data['maxScale']) && $data['type'] === "scale") {
+        $question->setMaxScale($data['maxScale']);
+    }
+
+    // ✅ Добавляем поддержку оценки вопросов
+    if (isset($data['isScorable'])) {
+        $question->setIsScorable($data['isScorable']);
+    }
+    if (isset($data['maxScore'])) {
+        $question->setMaxScore($data['maxScore']);
+    }
+
+    $entityManager->persist($question);
+    $entityManager->flush();
+
+    return $this->json(['message' => 'Вопрос добавлен!', 'id' => $question->getId()]);
+}
+
+#[Route('/api/questions/{id}', name: 'edit_question', methods: ['PUT'])]
+#[IsGranted('ROLE_USER')]
+public function editQuestion(Request $request, Question $question, EntityManagerInterface $entityManager): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+
+    if (isset($data['text'])) {
         $question->setText($data['text']);
+    }
+    if (isset($data['type'])) {
         $question->setType($data['type']);
-        
-        if (isset($data['options'])) {
-            $question->setOptions($data['options']);
-        }
-        if (isset($data['maxScale']) && $data['type'] === "scale") {
-            $question->setMaxScale($data['maxScale']);
-        }
-
-        $entityManager->persist($question);
-        $entityManager->flush();
-
-        return $this->json(['message' => 'Вопрос добавлен!', 'id' => $question->getId()]);
+    }
+    if (isset($data['options'])) {
+        $question->setOptions($data['options']);
+    }
+    if (isset($data['maxScale']) && $data['type'] === "scale") {
+        $question->setMaxScale($data['maxScale']);
     }
 
-    #[Route('/api/questions/{id}', name: 'edit_question', methods: ['PUT'])]
-    #[IsGranted('ROLE_USER')]
-    public function editQuestion(Request $request, Question $question, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-
-        if (isset($data['text'])) {
-            $question->setText($data['text']);
-        }
-        if (isset($data['type'])) {
-            $question->setType($data['type']);
-        }
-        if (isset($data['options'])) {
-            $question->setOptions($data['options']);
-        }
-        if (isset($data['maxScale']) && $data['type'] === "scale") {
-            $question->setMaxScale($data['maxScale']);
-        }
-
-        $entityManager->flush();
-
-        return $this->json(['message' => 'Вопрос обновлен!']);
+    // ✅ Добавляем поддержку редактирования `isScorable` и `maxScore`
+    if (isset($data['isScorable'])) {
+        $question->setIsScorable($data['isScorable']);
     }
+    if (isset($data['maxScore'])) {
+        $question->setMaxScore($data['maxScore']);
+    }
+
+    $entityManager->flush();
+
+    return $this->json(['message' => 'Вопрос обновлен!']);
+}
 
     #[Route('/api/questions/{id}', name: 'delete_question', methods: ['DELETE'])]
     #[IsGranted('ROLE_USER')]

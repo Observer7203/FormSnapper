@@ -35,6 +35,9 @@ class Form
     #[ORM\Column(type: "datetime", options: ["default" => "CURRENT_TIMESTAMP"])]
     private \DateTimeInterface $createdAt;
 
+    #[ORM\Column(type: "boolean", options: ["default" => false])]
+    private bool $isScorable = false;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -75,6 +78,9 @@ class Form
         }
         return $this;
     }
+
+    public function getIsScorable(): bool { return $this->isScorable; }
+    public function setIsScorable(bool $isScorable): self { $this->isScorable = $isScorable; return $this; }
 
 
     public function getAuthor(): User { return $this->author; }

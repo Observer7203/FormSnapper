@@ -28,12 +28,17 @@ public function createCustomForm(Request $request, EntityManagerInterface $entit
     $form->setTitle($data['title']);
     $form->setDescription($data['description'] ?? null);
     $form->setAuthor($this->getUser());
+    $form->setIsScorable($data['isScorable'] ?? false);
+
 
     foreach ($data['questions'] as $qData) {
         $question = new Question();
         $question->setForm($form);
         $question->setText($qData['text']);
         $question->setType($qData['type']);
+        $question->setIsScorable($qData['isScorable'] ?? false);
+        $question->setMaxScore($qData['maxScore'] ?? null);
+
         
         if (isset($qData['options'])) {
             $question->setOptions($qData['options']);
@@ -140,19 +145,32 @@ public function editFormPage(Form $form): HttpResponse
 }
 
 
-    #[Route('/api/forms/{id}/delete', name: 'app_delete_form', methods: ['DELETE'])]
-    #[IsGranted('ROLE_USER')]
-    public function deleteForm(Form $form, EntityManagerInterface $entityManager): JsonResponse
-    {
-        if ($form->getAuthor() !== $this->getUser()) {
-            return $this->json(['error' => 'Вы не можете удалить эту форму'], 403);
-        }
-
-        $entityManager->remove($form);
-        $entityManager->flush();
-
-        return $this->json(['message' => 'Форма удалена!']);
+#[Route('/api/forms/{id}/delete', name: 'app_delete_form', methods: ['DELETE'])]
+#[IsGranted('ROLE_USER')]
+public function deleteForm(Form $form, EntityManagerInterface $entityManager): JsonResponse
+{
+    if ($form->getAuthor() !== $this->getUser() && !in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+        return $this->json(['error' => 'Вы не можете удалить эту форму'], 403);
     }
+
+    // Получаем все ответы, связанные с этой формой
+    $responseRepository = $entityManager->getRepository(Response::class);
+    $responses = $responseRepository->findBy(['form' => $form]);
+
+    // Удаляем все связанные ответы
+    foreach ($responses as $response) {
+        $entityManager->remove($response);
+    }
+
+    $entityManager->flush(); // Сначала удаляем все ответы
+
+    // Теперь можно удалить саму форму
+    $entityManager->remove($form);
+    $entityManager->flush(); // Удаляем форму
+
+    return $this->json(['message' => 'Форма и все связанные ответы успешно удалены!']);
+}
+
 
     #[Route('/api/forms/{id}/submit', name: 'submit_form', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]

@@ -4,10 +4,11 @@ import axios from "axios";
 function CreateForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [isScorable, setIsScorable] = useState(false); // Новый state для оценки
   const [questions, setQuestions] = useState([]);
 
   const handleAddQuestion = () => {
-    setQuestions([...questions, { text: "", type: "text", options: [] }]);
+    setQuestions([...questions, { text: "", type: "text", options: [], maxScore: 1 }]);
   };
 
   const handleQuestionChange = (index, field, value) => {
@@ -29,6 +30,7 @@ function CreateForm() {
       const response = await axios.post("/api/forms", {
         title,
         description,
+        isScorable, // Передаем флаг оценки
         questions
       });
 
@@ -63,6 +65,17 @@ function CreateForm() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+        </div>
+
+        {/* Чекбокс для включения оценки */}
+        <div className="form-check">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            checked={isScorable}
+            onChange={(e) => setIsScorable(e.target.checked)}
+          />
+          <label className="form-check-label">Включить возможность оценки</label>
         </div>
 
         <h4>Вопросы</h4>
@@ -107,15 +120,43 @@ function CreateForm() {
                     }}
                   />
                 ))}
-                <button type="button" className="btn btn-sm btn-outline-primary mt-1" onClick={() => handleQuestionChange(index, "options", [...q.options, ""])}>Добавить вариант</button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-primary mt-1"
+                  onClick={() => handleQuestionChange(index, "options", [...q.options, ""])}
+                >
+                  Добавить вариант
+                </button>
               </div>
             )}
 
-            <button type="button" className="btn btn-sm btn-outline-danger mt-2" onClick={() => handleRemoveQuestion(index)}>Удалить</button>
+            {/* Если включено оценивание, показываем максимальный балл */}
+            {isScorable && (
+              <div className="mt-2">
+                <label className="form-label">Максимальный балл за вопрос</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={q.maxScore || 1}
+                  min="1"
+                  onChange={(e) => handleQuestionChange(index, "maxScore", e.target.value)}
+                />
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-danger mt-2"
+              onClick={() => handleRemoveQuestion(index)}
+            >
+              Удалить
+            </button>
           </div>
         ))}
 
-        <button type="button" className="btn btn-secondary" onClick={handleAddQuestion}>Добавить вопрос</button>
+        <button type="button" className="btn btn-secondary" onClick={handleAddQuestion}>
+          Добавить вопрос
+        </button>
         <button type="submit" className="btn btn-primary mt-3">Создать</button>
       </form>
     </div>

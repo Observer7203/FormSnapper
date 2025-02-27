@@ -6,6 +6,7 @@ function EditForm() {
   const { id } = useParams();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [isScorable, setIsScorable] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,6 +15,7 @@ function EditForm() {
       .then(response => {
         setTitle(response.data.title);
         setDescription(response.data.description);
+        setIsScorable(response.data.isScorable || false); // Загружаем настройку оценки
         setQuestions(response.data.questions || []);
         setLoading(false);
       })
@@ -29,6 +31,7 @@ function EditForm() {
       const response = await axios.put(`/api/forms/${id}/edit`, {
         title,
         description,
+        isScorable,
         questions
       });
 
@@ -43,7 +46,7 @@ function EditForm() {
   };
 
   const handleAddQuestion = () => {
-    setQuestions([...questions, { text: "", type: "text", options: [] }]);
+    setQuestions([...questions, { text: "", type: "text", options: [], maxScore: 1 }]);
   };
 
   const handleQuestionChange = (index, field, value) => {
@@ -81,6 +84,17 @@ function EditForm() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+        </div>
+
+        {/* Чекбокс для включения/отключения оценивания */}
+        <div className="form-check">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            checked={isScorable}
+            onChange={(e) => setIsScorable(e.target.checked)}
+          />
+          <label className="form-check-label">Включить возможность оценки</label>
         </div>
 
         <h4>Вопросы</h4>
@@ -125,15 +139,43 @@ function EditForm() {
                     }}
                   />
                 ))}
-                <button type="button" className="btn btn-sm btn-outline-primary mt-1" onClick={() => handleQuestionChange(index, "options", [...q.options, ""])}>Добавить вариант</button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-primary mt-1"
+                  onClick={() => handleQuestionChange(index, "options", [...q.options, ""])}
+                >
+                  Добавить вариант
+                </button>
               </div>
             )}
 
-            <button type="button" className="btn btn-sm btn-outline-danger mt-2" onClick={() => handleRemoveQuestion(index)}>Удалить</button>
+            {/* Если включено оценивание, показываем максимальный балл */}
+            {isScorable && (
+              <div className="mt-2">
+                <label className="form-label">Максимальный балл за вопрос</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={q.maxScore || 1}
+                  min="1"
+                  onChange={(e) => handleQuestionChange(index, "maxScore", e.target.value)}
+                />
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-danger mt-2"
+              onClick={() => handleRemoveQuestion(index)}
+            >
+              Удалить
+            </button>
           </div>
         ))}
 
-        <button type="button" className="btn btn-secondary" onClick={handleAddQuestion}>Добавить вопрос</button>
+        <button type="button" className="btn btn-secondary" onClick={handleAddQuestion}>
+          Добавить вопрос
+        </button>
         <button type="submit" className="btn btn-primary mt-3">Сохранить</button>
       </form>
     </div>
@@ -141,3 +183,4 @@ function EditForm() {
 }
 
 export default EditForm;
+

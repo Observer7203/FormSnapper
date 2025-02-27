@@ -31,6 +31,12 @@ class Question
     #[ORM\Column(type: "integer", nullable: true)]
     private ?int $maxScale = null; // Для шкалы (scale)
 
+    #[ORM\Column(type: "boolean", options: ["default" => false])]
+    private bool $isScorable = false;
+
+    #[ORM\Column(type: "integer", nullable: true)]
+    private ?int $maxScore = null;
+
     public function getId(): ?int { return $this->id; }
     public function getText(): string { return $this->text; }
     public function setText(string $text): self { $this->text = $text; return $this; }
@@ -51,5 +57,13 @@ public function setForm(?Form $form): self
     $this->form = $form;
     return $this;
 }
+
+
+public function getIsScorable(): bool { return $this->isScorable; }
+public function setIsScorable(bool $isScorable): self { $this->isScorable = $isScorable; return $this; }
+
+public function getMaxScore(): ?int { return $this->maxScore; }
+public function setMaxScore(?int $maxScore): self { $this->maxScore = $maxScore; return $this; }
+
 
 }

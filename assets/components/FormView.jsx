@@ -7,7 +7,8 @@ function FormView() {
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [responses, setResponses] = useState({});
+  const [responses, setResponses] = useState([]);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     axios.get(`/api/forms/${id}`)
@@ -20,11 +21,27 @@ function FormView() {
         setError("Ошибка загрузки формы");
         setLoading(false);
       });
+
+    axios.get("/api/user-role")
+      .then(response => {
+        setUserRole(response.data.role.includes("ROLE_ADMIN") ? "admin" : "user");
+      })
+      .catch(error => console.error("Ошибка получения роли:", error));
   }, [id]);
 
-  const handleChange = (questionId, value) => {
+  useEffect(() => {
+    if (userRole === "admin" || (form && form.author === userRole)) {
+      axios.get(`/api/forms/${id}/responses`)
+        .then((response) => setResponses(response.data))
+        .catch((error) => console.error("Ошибка загрузки ответов:", error));
+    }
+  }, [id, userRole, form]);
+
+
+    const handleChange = (questionId, value) => {
     setResponses({ ...responses, [questionId]: value });
   };
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -47,6 +64,7 @@ function FormView() {
     <div className="container mt-4">
       <h2 className="text-center">{form.title}</h2>
       <p className="text-center text-muted">{form.description}</p>
+
 
       <form onSubmit={handleSubmit}>
         {form.questions.map((question) => (
@@ -149,8 +167,37 @@ function FormView() {
 
         <button type="submit" className="btn btn-primary mt-3">Отправить ответы</button>
       </form>
+
+      {userRole === "admin" || (form && form.author === userRole) ? (
+        <div>
+    <h3>Ответы пользователей</h3>
+    {responses.length > 0 ? (
+      <ul className="list-group">
+        {responses.map((resp) => (
+          <li key={resp.id} className="list-group-item d-flex justify-content-between align-items-center">
+            {resp.user} - {resp.reviewed ? `Оценка: ${resp.score} / ${resp.maxScore}` : "Ожидает проверки"}
+            <a href={`/form/${id}/responses/${resp.id}`} className="btn btn-sm btn-primary">Просмотр</a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>Еще никто не заполнил форму.</p>
+    )}
+  </div>
+      ) : (
+        <div>
+          <h3>Ваши ответы</h3>
+          <a href={`/form/${id}/my-response`} className="btn btn-info">Посмотреть</a>
+        </div>
+      )}
     </div>
   );
 }
 
 export default FormView;
+
+
+
+
+
+
