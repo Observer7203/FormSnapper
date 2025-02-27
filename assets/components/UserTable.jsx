@@ -130,6 +130,8 @@ const UserTable = () => {
             <th>Email</th>
             <th>Status</th>
             <th>Last Login</th>
+            <th>Создан</th>
+            <th>Обновлен</th>
           </tr>
         </thead>
         <tbody>
@@ -155,6 +157,8 @@ const UserTable = () => {
                 </span>
               </td>
               <td>{user.lastLogin || "N/A"}</td>
+      <td>{user.createdAt ? new Date(user.createdAt).toLocaleString() : "N/A"}</td>
+      <td>{user.updatedAt ? new Date(user.updatedAt).toLocaleString() : "N/A"}</td>
             </tr>
           ))}
         </tbody>

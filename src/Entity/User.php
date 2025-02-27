@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -11,10 +12,16 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+
+
+
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: "users")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
@@ -46,6 +53,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "json")]
     private array $roles = [];
 
+
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTime $updatedAt = null;
+    
+
     public function getId(): ?int { return $this->id; }
     public function getEmail(): ?string { return $this->email; }
     public function setEmail(string $email): self { $this->email = $email; return $this; }
@@ -69,9 +86,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    #[ORM\Transient] // Не сохраняем в БД
+#[ORM\Column(type: Types::STRING, nullable: true)] // Не сохраняем в БД
 private ?string $plainPassword = null;
-
 public function getPlainPassword(): ?string
 {
     return $this->plainPassword;
@@ -86,4 +102,17 @@ public function setPlainPassword(?string $plainPassword): self
     public function eraseCredentials(): void {}
 
     public function getUserIdentifier(): string { return $this->email; }
+
+
+
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+{
+    return $this->createdAt;
+}
+public function getUpdatedAt(): ?\DateTime
+{
+    return $this->updatedAt;
+}
+
 }
