@@ -9,7 +9,9 @@ function FormView() {
   const [error, setError] = useState(null);
   const [responses, setResponses] = useState([]);
   const [userRole, setUserRole] = useState(null);
-  
+  const [userId, setUserId] = useState(null);
+  const [answers, setAnswers] = useState({});
+
   useEffect(() => {
     axios.get(`/api/forms/${id}`)
       .then((response) => {
@@ -21,35 +23,31 @@ function FormView() {
         setError("Ошибка загрузки формы");
         setLoading(false);
       });
-  
-    axios.get("/api/user-role")
+
+    axios.get("/api/user-info") // Получаем ID и роль пользователя
       .then(response => {
         setUserRole(response.data.role.includes("ROLE_ADMIN") ? "admin" : "user");
+        setUserId(response.data.id);
       })
       .catch(error => console.error("Ошибка получения роли:", error));
   }, [id]);
-  
+
   useEffect(() => {
-    if (userRole === "admin" || (form && form.authorId === userId)) {  // ✅ Автор тоже видит
+    if ((userRole === "admin" || (form && form.authorId === userId)) && form) {
       axios.get(`/api/forms/${id}/responses`)
         .then((response) => setResponses(response.data))
         .catch((error) => console.error("Ошибка загрузки ответов:", error));
     }
-  }, [id, userRole, form]);
-  
+  }, [id, userRole, form, userId]);
 
-
-    const handleChange = (questionId, value) => {
-    setResponses({ ...responses, [questionId]: value });
+  const handleChange = (questionId, value) => {
+    setAnswers({ ...answers, [questionId]: value });
   };
-
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      await axios.post(`/api/forms/${id}/submit`, {
-        answers: responses
-      });
+      await axios.post(`/api/forms/${id}/submit`, { answers });
       alert("Ответы успешно отправлены!");
       window.location.href = "/forms";
     } catch (error) {
@@ -66,126 +64,132 @@ function FormView() {
       <h2 className="text-center">{form.title}</h2>
       <p className="text-center text-muted">{form.description}</p>
 
+      {/* ✅ Форма доступна ВСЕМ пользователям */}
+      {(userRole !== "admin" && form.authorId !== userId) && (
+        <form onSubmit={handleSubmit}>
+          {form.questions.map((question) => (
+            <div key={question.id} className="mb-4 p-3 border rounded">
+              <label className="form-label">{question.text}</label>
 
-      <form onSubmit={handleSubmit}>
-        {form.questions.map((question) => (
-          <div key={question.id} className="mb-4 p-3 border rounded">
-            <label className="form-label">{question.text}</label>
+              {question.type === "text" && (
+                <input
+                  type="text"
+                  className="form-control"
+                  onChange={(e) => handleChange(question.id, e.target.value)}
+                  required
+                />
+              )}
 
-            {question.type === "text" && (
-              <input
-                type="text"
-                className="form-control"
-                onChange={(e) => handleChange(question.id, e.target.value)}
-                required
-              />
-            )}
+              {question.type === "number" && (
+                <input
+                  type="number"
+                  className="form-control"
+                  onChange={(e) => handleChange(question.id, e.target.value)}
+                  required
+                />
+              )}
 
-            {question.type === "number" && (
-              <input
-                type="number"
-                className="form-control"
-                onChange={(e) => handleChange(question.id, e.target.value)}
-                required
-              />
-            )}
+              {question.type === "radio" && question.options && (
+                question.options.map((option, index) => (
+                  <div key={index} className="form-check">
+                    <input
+                      type="radio"
+                      name={`question_${question.id}`}
+                      value={option}
+                      className="form-check-input"
+                      onChange={(e) => handleChange(question.id, e.target.value)}
+                    />
+                    <label className="form-check-label">{option}</label>
+                  </div>
+                ))
+              )}
 
-            {question.type === "radio" && question.options && (
-              question.options.map((option, index) => (
-                <div key={index} className="form-check">
-                  <input
-                    type="radio"
-                    name={`question_${question.id}`}
-                    value={option}
-                    className="form-check-input"
-                    onChange={(e) => handleChange(question.id, e.target.value)}
-                  />
-                  <label className="form-check-label">{option}</label>
+              {question.type === "checkbox" && question.options && (
+                question.options.map((option, index) => (
+                  <div key={index} className="form-check">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      onChange={(e) => {
+                        const selected = answers[question.id] || [];
+                        if (e.target.checked) {
+                          setAnswers({ ...answers, [question.id]: [...selected, option] });
+                        } else {
+                          setAnswers({
+                            ...answers,
+                            [question.id]: selected.filter((val) => val !== option)
+                          });
+                        }
+                      }}
+                    />
+                    <label className="form-check-label">{option}</label>
+                  </div>
+                ))
+              )}
+
+              {question.type === "file_upload" && (
+                <input
+                  type="file"
+                  className="form-control"
+                  onChange={(e) => handleChange(question.id, e.target.files[0])}
+                />
+              )}
+
+              {question.type === "rating" && (
+                <div>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      style={{
+                        fontSize: "1.5rem",
+                        cursor: "pointer",
+                        color: answers[question.id] >= star ? "gold" : "gray"
+                      }}
+                      onClick={() => handleChange(question.id, star)}
+                    >
+                      ★
+                    </span>
+                  ))}
                 </div>
-              ))
-            )}
+              )}
 
-            {question.type === "checkbox" && question.options && (
-              question.options.map((option, index) => (
-                <div key={index} className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    onChange={(e) => {
-                      const selected = responses[question.id] || [];
-                      if (e.target.checked) {
-                        setResponses({ ...responses, [question.id]: [...selected, option] });
-                      } else {
-                        setResponses({
-                          ...responses,
-                          [question.id]: selected.filter((val) => val !== option)
-                        });
-                      }
-                    }}
-                  />
-                  <label className="form-check-label">{option}</label>
-                </div>
-              ))
-            )}
+              {question.type === "scale" && (
+                <input
+                  type="range"
+                  min="1"
+                  max={question.maxScale || 10}
+                  className="form-range"
+                  onChange={(e) => handleChange(question.id, e.target.value)}
+                />
+              )}
+            </div>
+          ))}
 
-            {question.type === "file_upload" && (
-              <input
-                type="file"
-                className="form-control"
-                onChange={(e) => handleChange(question.id, e.target.files[0])}
-              />
-            )}
+          <button type="submit" className="btn btn-primary mt-3">Отправить ответы</button>
+        </form>
+      )}
 
-            {question.type === "rating" && (
-              <div>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span
-                    key={star}
-                    style={{
-                      fontSize: "1.5rem",
-                      cursor: "pointer",
-                      color: responses[question.id] >= star ? "gold" : "gray"
-                    }}
-                    onClick={() => handleChange(question.id, star)}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {question.type === "scale" && (
-              <input
-                type="range"
-                min="1"
-                max={question.maxScale || 10}
-                className="form-range"
-                onChange={(e) => handleChange(question.id, e.target.value)}
-              />
-            )}
-          </div>
-        ))}
-
-        <button type="submit" className="btn btn-primary mt-3">Отправить ответы</button>
-      </form>
-
-      {userRole === "admin" || (form && form.author === userRole) ? (
+      {/* ✅ Показываем список ответов ТОЛЬКО админам и автору */}
+      {(userRole === "admin" || form.authorId === userId) && (
         <div>
-    <h3>Ответы пользователей</h3>
-    {responses.length > 0 ? (
-      <ul className="list-group">
-        {responses.map((resp) => (
-          <li key={resp.id} className="list-group-item d-flex justify-content-between align-items-center">
-            {resp.user} - {resp.reviewed ? `Оценка: ${resp.score} / ${resp.maxScore}` : "Ожидает проверки"}
-            <a href={`/form/${id}/responses/${resp.id}`} className="btn btn-sm btn-primary">Просмотр</a>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p>Еще никто не заполнил форму.</p>
-    )}
-  </div>
-      ) : (
+          <h3>Ответы пользователей</h3>
+          {responses.length > 0 ? (
+            <ul className="list-group">
+              {responses.map((resp) => (
+                <li key={resp.id} className="list-group-item d-flex justify-content-between align-items-center">
+                  {resp.user} - {resp.reviewed ? `Оценка: ${resp.score} / ${resp.maxScore}` : "Ожидает проверки"}
+                  <a href={`/form/${id}/responses/${resp.id}`} className="btn btn-sm btn-primary">Просмотр</a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Еще никто не заполнил форму.</p>
+          )}
+        </div>
+      )}
+
+      {/* ✅ Кнопка для просмотра своих ответов */}
+      {userRole !== "admin" && form.authorId !== userId && (
         <div>
           <h3>Ваши ответы</h3>
           <a href={`/form/${id}/my-response`} className="btn btn-info">Посмотреть</a>
@@ -196,6 +200,7 @@ function FormView() {
 }
 
 export default FormView;
+
 
 
 

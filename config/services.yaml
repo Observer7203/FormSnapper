@@ -11,10 +11,16 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    App\Controller\SalesforceController:
+        arguments:
+            $salesforceService: '@App\Service\SalesforceOAuthService'
+        tags: ['controller.service_arguments']
+
 
     Gedmo\Timestampable\TimestampableListener:
         tags:
             - { name: doctrine.event_subscriber }
+    
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
